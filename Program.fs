@@ -38,12 +38,12 @@ module Graph =
             else
                 filtered
 
-    let map f graph =
+    let rec map f graph =
         match graph with
         | Empty -> Empty
         | Next (curr, next) ->
             let mapped = f curr
-            Next(edge curr.Nodes mapped, next)
+            Next(edge curr.Nodes mapped, map f next)
 
     let rec withEdge edge graph = edge |> singleEdge |> merge graph
 
