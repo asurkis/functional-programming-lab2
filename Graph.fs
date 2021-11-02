@@ -37,8 +37,10 @@ let rec complement left right =
         | Next (currr, nextr) ->
             if currl.Nodes < currr.Nodes then
                 Next(currl, complement nextl right)
-            else
+            elif currl.Nodes = currr.Nodes then
                 complement nextl nextr
+            else
+                complement left nextr
 
 let rec filter f graph =
     match graph with

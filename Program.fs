@@ -2,21 +2,23 @@ open Lab2
 
 [<EntryPoint>]
 let main _ =
-    let g1 = Graph.Empty
-    let g2 = Graph.edge (0, 0) 0 |> Graph.singleEdge
-    let union = Graph.union g1 g2
+    let left, right =
+        (Graph.Next struct ({ Nodes = struct (1, 1); Weight = -6 }, Graph.Empty),
+         Graph.Next
+             struct ({ Nodes = struct (-1, 2); Weight = -4 },
+                     Graph.Next struct ({ Nodes = struct (0, 0); Weight = 0 }, Graph.Empty)))
 
-    printfn "%A" g1
-    printfn "%A" g2
-    printfn "%A" union
-    printfn "%A" (Graph.complement g1 g2)
-    printfn "%A" (Graph.complement union g2)
+    // let complement = Graph.complement left right
+    // let u1 = Graph.union complement right
+    // let u2 = Graph.union right complement
+    let union = Graph.union left right
+    let c1 = Graph.complement left right
+    let c2 = Graph.complement union right
 
-    match union with
-    | Graph.Empty -> ()
-    | Graph.Next (edgeu, _) ->
-        match g2 with
-        | Graph.Empty -> ()
-        | Graph.Next (edger, _) -> printfn "(%A = %A) = %A" edgeu.Nodes edger.Nodes (edgeu.Nodes = edger.Nodes)
-
+    printfn "left  = %A" left
+    printfn "right = %A" right
+    printfn "left + right = %A" union
+    printfn "left - right = %A" c1
+    printfn "(left + right) - right = %A" c2
+    printfn "equality = %A" (c1 = c2)
     0
