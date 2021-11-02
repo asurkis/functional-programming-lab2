@@ -25,6 +25,21 @@ let ``Complement of valid graphs is a valid graph`` (left: int Graph.Graph) (rig
     || isGraphValid (Graph.complement left right)
 
 [<Property>]
+let ``Empty graph is identity element for union`` (graph: int Graph.Graph) =
+    not (isGraphValid graph)
+    || Graph.union graph Graph.Empty = graph
+
+[<Property>]
+let ``Complement with empty graph produces the base graph`` (graph: int Graph.Graph) =
+    not (isGraphValid graph)
+    || Graph.complement graph Graph.Empty = graph
+
+[<Property>]
+let ``Complement of empty graph is empty graph`` (graph: int Graph.Graph) =
+    not (isGraphValid graph)
+    || Graph.complement Graph.Empty graph = Graph.Empty
+
+[<Property>]
 let ``Union of graph with itself is itself`` (graph: int Graph.Graph) =
     not (isGraphValid graph)
     || Graph.union graph graph = graph
