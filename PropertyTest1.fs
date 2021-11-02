@@ -7,9 +7,12 @@ let rec isGraphValid graph =
     match graph with
     | Graph.Empty -> true
     | Graph.Next (edge, next) ->
-        match next with
-        | Graph.Empty -> true
-        | Graph.Next (nextEdge, _) -> edge.Nodes < nextEdge.Nodes && isGraphValid next
+        let struct (na, nb) = edge.Nodes
+
+        na < nb
+        && match next with
+           | Graph.Empty -> true
+           | Graph.Next (nextEdge, _) -> edge.Nodes < nextEdge.Nodes && isGraphValid next
 
 [<Property>]
 let ``Graph is equal to itself`` (graph: int Graph.Graph) = graph = graph
@@ -71,3 +74,14 @@ let ``Union of graphs is commutative`` (left: int Graph.Graph) (right: int Graph
 
     not (isGraphValid left && isGraphValid right)
     || unionLeft = unionRight
+
+[<Property>]
+let ``Identity mapping is identity`` (graph: int Graph.Graph) =
+    not (isGraphValid graph)
+    || Graph.map (fun e -> e.Weight) graph = graph
+
+[<Property>]
+let ``Double mapping`` (f: int Graph.Edge -> int) (g: int Graph.Edge -> int) (graph: int Graph.Graph) =
+    not (isGraphValid graph)
+    || (graph |> Graph.map f |> Graph.map g) = (graph
+                                                |> Graph.map (fun e -> f e |> Graph.edge e.Nodes |> g))
