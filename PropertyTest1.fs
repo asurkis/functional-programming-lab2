@@ -25,6 +25,16 @@ let ``Complement of valid graphs is a valid graph`` (left: int Graph.Graph) (rig
     || isGraphValid (Graph.complement left right)
 
 [<Property>]
+let ``Union of graph with itself is itself`` (graph: int Graph.Graph) =
+    not (isGraphValid graph)
+    || Graph.union graph graph = graph
+
+[<Property>]
+let ``Complement of graph with itself is empty graph`` (graph: int Graph.Graph) =
+    not (isGraphValid graph)
+    || Graph.complement graph graph = Graph.Empty
+
+[<Property>]
 let ``Complement of graphs is complement of union and right graph`` (left: int Graph.Graph) (right: int Graph.Graph) =
     let union = Graph.union left right
     let compLeft = Graph.complement left right
