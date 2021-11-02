@@ -124,3 +124,17 @@ let ``Sum of filters`` (Fun f) (Fun g) (graph: int Graph.Graph) =
 
     isGraphValid graph
     ==> ((Graph.union filtered1 filtered2) = (Graph.filter composed graph))
+
+[<Property>]
+let ``Map and filter``
+    (Fun f: Function<int Graph.Edge, bool>)
+    (Fun g: Function<int Graph.Edge, int>)
+    (graph: int Graph.Graph)
+    =
+    let composed (e: int Graph.Edge) = g e |> Graph.edge e.Nodes |> f
+    let mapFilter = graph |> Graph.map g |> Graph.filter f
+
+    let filterMap =
+        graph |> Graph.filter composed |> Graph.map g
+
+    isGraphValid graph ==> (mapFilter = filterMap)
