@@ -1,5 +1,6 @@
 module Lab2.PropertyTest1
 
+open FsCheck
 open FsCheck.NUnit
 open Lab2
 
@@ -81,7 +82,45 @@ let ``Identity mapping is identity`` (graph: int Graph.Graph) =
     || Graph.map (fun e -> e.Weight) graph = graph
 
 [<Property>]
-let ``Double mapping`` (f: int Graph.Edge -> int) (g: int Graph.Edge -> int) (graph: int Graph.Graph) =
+let ``Double mapping``
+    (Fun f: Function<int Graph.Edge, int>)
+    (Fun g: Function<int Graph.Edge, int>)
+    (graph: int Graph.Graph)
+    =
+    let composed (e: int Graph.Edge) = f e |> Graph.edge e.Nodes |> g
+
     not (isGraphValid graph)
-    || (graph |> Graph.map f |> Graph.map g) = (graph
-                                                |> Graph.map (fun e -> f e |> Graph.edge e.Nodes |> g))
+    || (graph |> Graph.map f |> Graph.map g) = (Graph.map composed graph)
+
+[<Property>]
+let ``True filter produces identical graph`` (graph: int Graph.Graph) =
+    let filter _ = true
+
+    not (isGraphValid graph)
+    || Graph.filter filter graph = graph
+
+[<Property>]
+let ``False filter produces empty graph`` (graph: int Graph.Graph) =
+    let filter _ = false
+
+    not (isGraphValid graph)
+    || Graph.filter filter graph = Graph.Empty
+
+[<Property>]
+let ``Product of filters`` (Fun f) (Fun g) (graph: int Graph.Graph) =
+    let composed e = f e && g e
+
+    let filtered =
+        graph |> Graph.filter f |> Graph.filter g
+
+    isGraphValid graph
+    ==> ((graph |> Graph.filter f |> Graph.filter g) = (Graph.filter composed graph))
+
+[<Property>]
+let ``Sum of filters`` (Fun f) (Fun g) (graph: int Graph.Graph) =
+    let composed e = f e || g e
+    let filtered1 = Graph.filter f graph
+    let filtered2 = Graph.filter g graph
+
+    isGraphValid graph
+    ==> ((Graph.union filtered1 filtered2) = (Graph.filter composed graph))
