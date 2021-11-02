@@ -15,6 +15,16 @@ let rec validGraph graph =
 let ``Graph is equal to itself`` (graph: int Graph.Graph) = graph = graph
 
 [<Property>]
+let ``Union of valid graphs is a valid graph`` (left: int Graph.Graph) (right: int Graph.Graph) =
+    not (validGraph left && validGraph right)
+    || validGraph (Graph.union left right)
+
+[<Property>]
+let ``Complement of valid graphs is a valid graph`` (left: int Graph.Graph) (right: int Graph.Graph) =
+    not (validGraph left && validGraph right)
+    || validGraph (Graph.complement left right)
+
+[<Property>]
 let ``Complement of graphs is complement of union and right graph`` (left: int Graph.Graph) (right: int Graph.Graph) =
     let union = Graph.union left right
     let compLeft = Graph.complement left right
