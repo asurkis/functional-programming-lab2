@@ -30,16 +30,16 @@ type GraphGenerator =
             member _.Generator = generateGraph ()
             member _.Shrinker _ = Seq.empty }
 
-let rec isGraphValid graph =
-    match graph with
+let rec isGraphValid =
+    function
     | Graph.Empty -> true
-    | Graph.Next (edge, next) ->
-        let (na, nb) = edge.Nodes
-
-        na < nb
-        && match next with
-           | Graph.Empty -> true
-           | Graph.Next (nextEdge, _) -> edge.Nodes < nextEdge.Nodes && isGraphValid next
+    | Graph.Next ({ Graph.Edge.Nodes = (na, nb)
+                    Graph.Edge.Weight = _ },
+                  _) when na >= nb -> false
+    | Graph.Next (_, Graph.Empty) -> true
+    | Graph.Next (edge, Graph.Next (nextEdge, nextElement)) ->
+        edge.Nodes < nextEdge.Nodes
+        && isGraphValid (Graph.Next(nextEdge, nextElement))
 
 [<NUnit.Framework.SetUp>]
 let setup () =
