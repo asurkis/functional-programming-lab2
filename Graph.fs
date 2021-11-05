@@ -6,7 +6,7 @@ type 'T Edge =
 
 type 'T Graph =
     | Empty
-    | Next of struct ('T Edge * 'T Graph)
+    | Next of 'T Edge * 'T Graph
 
 let edge struct (na, nb) weight =
     { Nodes = if na < nb then na, nb else nb, na
@@ -15,50 +15,31 @@ let edge struct (na, nb) weight =
 let singleEdge edge = Next(edge, Empty)
 
 let rec union left right =
-    match left with
-    | Empty -> right
-    | Next (currl, nextl) ->
-        match right with
-        | Empty -> left
-        | Next (currr, nextr) ->
-            if currl.Nodes < currr.Nodes then
-                Next(currl, union nextl right)
-            elif currl.Nodes > currr.Nodes then
-                Next(currr, union left nextr)
-            else
-                Next(currl, union nextl nextr)
+    match left, right with
+    | Empty, _ -> right
+    | _, Empty -> left
+    | Next (currl, nextl), Next (currr, _) when currl.Nodes < currr.Nodes -> Next(currl, union nextl right)
+    | Next (currl, _), Next (currr, nextr) when currl.Nodes > currr.Nodes -> Next(currr, union left nextr)
+    | Next (currl, nextl), Next (_, nextr) -> Next(currl, union nextl nextr)
 
 let rec complement left right =
-    match left with
-    | Empty -> Empty
-    | Next (currl, nextl) ->
-        match right with
-        | Empty -> left
-        | Next (currr, nextr) ->
-            if currl.Nodes < currr.Nodes then
-                Next(currl, complement nextl right)
-            elif currl.Nodes = currr.Nodes then
-                complement nextl nextr
-            else
-                complement left nextr
+    match left, right with
+    | Empty, _ -> Empty
+    | _, Empty -> left
+    | Next (currl, _), Next (currr, nextr) when currl.Nodes > currr.Nodes -> complement left nextr
+    | Next (currl, nextl), Next (currr, nextr) when currl.Nodes = currr.Nodes -> complement nextl nextr
+    | Next (currl, nextl), _ -> Next(currl, complement nextl right)
 
 let rec filter f graph =
     match graph with
     | Empty -> Empty
-    | Next (curr, next) ->
-        let filtered = filter f next
-
-        if f curr then
-            Next(curr, filtered)
-        else
-            filtered
+    | Next (curr, next) when f curr -> Next(curr, filter f next)
+    | Next (_, next) -> filter f next
 
 let rec map f graph =
     match graph with
     | Empty -> Empty
-    | Next (curr, next) ->
-        let mapped = f curr
-        Next(edge curr.Nodes mapped, map f next)
+    | Next (curr, next) -> Next(edge curr.Nodes (f curr), map f next)
 
 let rec withEdge edge graph = edge |> singleEdge |> union graph
 
