@@ -30,14 +30,14 @@ let rec complement left right =
     | Next (currl, nextl), Next (currr, nextr) when currl.Nodes = currr.Nodes -> complement nextl nextr
     | Next (currl, nextl), _ -> Next(currl, complement nextl right)
 
-let rec filter f graph =
-    match graph with
+let rec filter f =
+    function
     | Empty -> Empty
     | Next (curr, next) when f curr -> Next(curr, filter f next)
     | Next (_, next) -> filter f next
 
-let rec map f graph =
-    match graph with
+let rec map f =
+    function
     | Empty -> Empty
     | Next (curr, next) -> Next(edge curr.Nodes (f curr), map f next)
 
