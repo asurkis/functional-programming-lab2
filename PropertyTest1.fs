@@ -33,9 +33,7 @@ type GraphGenerator =
 let rec isGraphValid =
     function
     | Graph.Empty -> true
-    | Graph.Next ({ Graph.Edge.Nodes = (na, nb)
-                    Graph.Edge.Weight = _ },
-                  _) when na >= nb -> false
+    | Graph.Next ({ Graph.Edge.Nodes = na, nb }, _) when na >= nb -> false
     | Graph.Next (_, Graph.Empty) -> true
     | Graph.Next (edge, Graph.Next (nextEdge, nextElement)) ->
         edge.Nodes < nextEdge.Nodes
