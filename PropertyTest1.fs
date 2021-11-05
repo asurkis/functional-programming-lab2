@@ -8,7 +8,7 @@ let rec isGraphValid graph =
     match graph with
     | Graph.Empty -> true
     | Graph.Next (edge, next) ->
-        let struct (na, nb) = edge.Nodes
+        let (na, nb) = edge.Nodes
 
         na < nb
         && match next with

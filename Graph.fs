@@ -1,14 +1,14 @@
 module Lab2.Graph
 
 type 'T Edge =
-    { Nodes: struct (int * int)
+    { Nodes: (int * int)
       Weight: 'T }
 
 type 'T Graph =
     | Empty
     | Next of 'T Edge * 'T Graph
 
-let edge struct (na, nb) weight =
+let edge (na, nb) weight =
     { Nodes = if na < nb then na, nb else nb, na
       Weight = weight }
 
