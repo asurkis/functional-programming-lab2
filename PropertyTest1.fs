@@ -19,7 +19,7 @@ let transformList firstEdge list =
     |> List.skip 1
     |> listToGraph
 
-let rec generateGraph () =
+let generateGraph () =
     Gen.map2 transformList
     <| Arb.generate
     <| Gen.listOf Arb.generate
